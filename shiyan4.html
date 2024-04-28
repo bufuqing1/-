@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>广告网页示例</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+			font-family: Arial, sans-serif;         
+			background-color: #f5f5f5;
+			display: flex;
+			justify-content: center; /* 水平居中 */
+			align-items: center; /* 垂直居中 */
+			height: 100vh; /* 设置视口高度的100%作为容器高度 */
+        }
+        #content {
+            height: 200vh; /* 页面高度至少3屏 */
+            padding: 20px;
+            background-color: #f5f5f5;
+			border-radius: 5px;
+			box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			max-width: 600px; /* 设置内容最大宽度 */
+			width: 100%; /* 宽度100%，占满父容器 */        }
+
+		/* 对联广告样式 */
+		#leftAd, #rightAd {
+		    position: fixed;
+		    top: 10px;
+		    width: 150px; /* 广告宽度可根据需求调整 */
+		    height: 167px; /* 广告高度可根据需求调整 */
+		    background-color: #f1f1f1; /* 广告背景颜色可根据需求调整 */
+		    padding: 10px;
+		    text-align: center;
+		    line-height: 100px; /* 垂直居中 */
+		}
+		
+		#leftAd {
+		    left: 0;
+		}
+		
+		#rightAd {
+		    right: 0;
+		}
+        .pop-up {
+            position: fixed;
+            bottom: -320px;
+            right: 20px;
+            width: 200px;
+			height: 233px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: bottom 1s ease-in-out;
+        }
+        .pop-up.show {
+            bottom: 20px;
+        }
+		
+		/* 关闭按钮样式 */
+		.close {
+		    position: absolute;
+		    top: 5;
+		    right: 5px;
+		    cursor: pointer;
+			bottom: 120px;
+			border-radius: 5px;
+			padding: 5px ;
+			
+			
+		
+		}
+       .close-btn {
+           background: #ff5252; /* 默认背景颜色 */
+           color: white; /* 默认文本颜色 */
+           border: none;
+           border-radius: 5px;
+           padding: 5px 10px;
+           cursor: pointer;
+           position: absolute;
+           top: 5px;
+           right: 5px;
+           transition: background-color 0.3s; /* 添加过渡效果 */
+       }
+       
+       .close-btn:hover {
+           background: #d81b60; /* 悬停时的背景颜色 */
+       }
+
+		img {
+		    max-width: 100%; /* 图片最大宽度为其容器的宽度 */
+			height: auto;
+		    display: block;
+		    margin-bottom: 20px;
+			object-fit: cover; /* 图片按比例填充容器，可能会裁剪部分内容 */
+		}
+
+    </style>
+</head>
+<body>
+
+  
+ <!-- 左侧对联广告 -->
+    <div id="leftAd">
+        <img src="img/G.png" alt="左侧广告图片">
+        <span class="close" onclick="closeLeftAd()">关闭</span>
+    </div>
+	
+	<!-- 右侧对联广告 -->
+	<div id="rightAd">
+	   <img src="img/Ben11.jpg" alt="右侧广告图片">
+	    <span class="close" onclick="closeRightAd()">关闭</span>
+	</div>
+
+    <div id="content">
+        <h1>网页主要内容</h1>
+        <p>这里是网页的主要内容。</p>
+        <!-- 插入第一张图片 -->
+        <img src="img/Ben3.JPG" alt="第一张图片">
+        <p>这是第一张图片的描述。</p>
+        <!-- 插入第二张图片 -->
+        <img src="img/Ben4.JPG" alt="第二张图片">
+        <p>这是第二张图片的描述。</p>
+        <!-- 其他页面内容 -->
+    </div>
+    <div id="popUpAd" class="pop-up">
+        <img src="img/Ben12.jpg" alt="右下侧广告图片">
+        <button class="close-btn" onclick="closePopUp()">关闭</button>
+    </div>
+
+    <script>
+        // 页面加载完成后显示右下角弹窗广告
+        window.onload = function() {
+            setTimeout(function() {
+                document.getElementById('popUpAd').classList.add('show');
+            }, 1000); // 1秒后显示
+        };
+
+  
+		// 关闭左侧对联广告
+        function closeLeftAd() {
+            document.getElementById("leftAd").style.display = "none";
+        }
+        
+        // 关闭右侧对联广告
+        function closeRightAd() {
+            document.getElementById("rightAd").style.display = "none";
+        }
+
+        // 关闭右下角弹窗广告
+        function closePopUp() {
+            document.getElementById('popUpAd').classList.remove('show');
+        }
+    </script>
+</body>
+</html>
