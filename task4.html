@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>使用 jQuery 修改表格</title>
+   <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+       
+	    <style>
+	           body {
+	               font-family: Arial, sans-serif;
+	               margin: 0;
+	               padding: 0;
+	               background: #f4f4f4;
+	           }
+	           h1 {
+	               text-align: center;
+	               padding: 20px;
+	               background: #333;
+	               color: #fff;
+	               margin: 0;
+	           }
+	           table {
+	               width: 80%;
+	               margin: 20px auto;
+	               border-collapse: collapse;
+	           }
+	           th, td {
+	               padding: 10px;
+	               border: 1px solid #ddd;
+	               text-align: left;
+	           }
+	           th {
+	               background: #333;
+	               color: #fff;
+	           }
+	           td {
+	               background: #fff;
+	           }
+	           button {
+	               display: block;
+	               margin: 10px auto;
+	               padding: 10px 20px;
+	               font-size: 16px;
+	               cursor: pointer;
+	               background: #5cb85c;
+	               color: #fff;
+	               border: none;
+	               border-radius: 5px;
+	               box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	           }
+	           button:hover {
+	               background: #4cae4c;
+	           }
+	       </style>
+	   <script>
+             $(document).ready(function() {
+                 var booksTable = $('#booksTable');
+                 var sortOrder = 1; // 1 for ascending, -1 for descending
+     
+                 // 添加按钮功能
+                 $('#addButton').click(function() {
+                     var newBookName = prompt("请输入新书名:", "新书名");
+                     var newBookPrice = prompt("请输入新价格:", "0.00");
+                     if (newBookName && newBookPrice) {
+                         booksTable.find('tbody').append('<tr><td>' + newBookName + '</td><td>¥' + newBookPrice + '</td></tr>');
+                         // 重新排序表格
+                         sortTable();
+                     }
+                 });
+     
+                 // 删除按钮功能
+                 $('#deleteButton').click(function() {
+                     var rowNumber = prompt("请输入要删除的行号 (从1开始):", "1");
+                     if (rowNumber && rowNumber > 0 && rowNumber <= booksTable.find('tbody tr').length) {
+                         booksTable.find('tbody tr').eq(rowNumber - 1).remove();
+                     }
+                 });
+     
+                 // 修改按钮功能
+                 $('#editButton').click(function() {
+                     var rowNumber = prompt("请输入要修改的行号 (从1开始):", "1");
+                     if (rowNumber && rowNumber > 0 && rowNumber <= booksTable.find('tbody tr').length) {
+                         var $row = booksTable.find('tbody tr').eq(rowNumber - 1);
+                         var newBookName = prompt("请输入新的书名:", $row.find('td').eq(0).text());
+                         var newBookPrice = prompt("请输入新的价格:", $row.find('td').eq(1).text().replace('¥', ''));
+                         if (newBookName && newBookPrice) {
+                             $row.find('td').eq(0).text(newBookName);
+                             $row.find('td').eq(1).text('¥' + newBookPrice);
+                             // 重新排序表格
+                             sortTable();
+                         }
+                     }
+                 });
+     
+                 // 排序按钮功能
+                 $('#sortButton').click(function() {
+                     sortOrder = sortOrder === 1 ? -1 : 1; // Toggle the sort order
+                     sortTable();
+                 });
+     
+                 // 排序表格函数
+                 function sortTable() {
+                     var rows = booksTable.find('tbody tr').get();
+                     rows.sort(function(a, b) {
+                         var priceA = parseFloat($(a).find('td').eq(1).text().replace('¥', ''));
+                         var priceB = parseFloat($(b).find('td').eq(1).text().replace('¥', ''));
+                         return sortOrder * (priceA - priceB);
+                     });
+                     $(rows).detach().appendTo(booksTable.find('tbody'));
+                 }
+             });
+         </script>
+     </head>
+     <body>
+         <h1>书籍列表</h1>
+         <table id="booksTable">
+             <thead>
+                 <tr>
+                     <th>书名</th>
+                     <th>价格</th>
+                 </tr>
+             </thead>
+             <tbody>
+                 <tr>
+                     <td>看得见风景的房间</td>
+                     <td>¥30.00</td>
+                 </tr>
+                 <tr>
+                     <td>60个瞬间</td>
+                     <td>¥32.00</td>
+                 </tr>
+             </tbody>
+         </table>
+         <button id="addButton">添加书籍</button>
+         <button id="deleteButton">删除书籍</button>
+         <button id="editButton">修改书籍</button>
+         <button id="sortButton">按价格排序</button>
+     </body>
+     </html>
