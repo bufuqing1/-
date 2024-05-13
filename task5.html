@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>简易网页游戏</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: black; /* 设置背景为黑色 */
+        }
+        .game-character, .monster {
+            position: absolute;
+            cursor: pointer;
+			 position: absolute;
+			z-index: 2; /* 默认值 */
+        }
+		.treasure {
+		    position: absolute;
+		    z-index: 1; /* 宝箱的层级更高，不会被遮挡 */
+    </style>
+	
+</head>
+<body>
+    <div id="game-container">
+        <img class="game-character" id="player" src="img/player_right.gif" style="width: 100px; height: 100px; top: 50px; left: 50px;">
+        <img class="monster" id="monster" src="img/player1_big.gif" style="width: 100px; height: 100px; display: none;">
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+		<script>
+		$(document).ready(function() {
+		    var player = $('#player');
+		    var monsters = []; // 存储怪兽的jQuery对象
+		        var monsterImages = [
+		            'img/player_big.gif', // 怪兽1的图片
+		            'img/player1.gif', // 怪兽2的图片
+		            'img/player1_big.gif'  // 怪兽3的图片
+		        ];
+		    var gameContainer = $('#game-container');
+		    var isTransformed = false; // 标记角色是否已经变身
+		    var lastMonsterDeathTime = 0;
+		    var monsterRespawnTime = 8000; // 怪兽复活时间8秒
+		
+		    // 鼠标点击游戏角色移动
+		    gameContainer.on('click', function(e) {
+		        var playerCenterX = player.offset().left + player.width() / 2;
+		        var relativeX = e.pageX - gameContainer.offset().left;
+		
+		        // 根据点击位置选择图片
+		        var spriteDirection = relativeX < playerCenterX ? '_left' : '_right';
+		        var spriteName = isTransformed ? 'playerbig' : 'player';
+		        var newSpriteSrc = 'img/' + spriteName + spriteDirection + '.gif';
+		
+		        // 更新角色的图片
+		        player.attr('src', newSpriteSrc);
+		
+		        // 角色移动到点击位置
+		        var relativeY = e.pageY - gameContainer.offset().top;
+		        player.stop().animate({
+		            top: relativeY - player.height() / 2,
+		            left: relativeX - player.width() / 2
+		        }, 500);
+		    });
+		
+		    // 鼠标双击变身
+		    player.on('dblclick', function() {
+		        var baseName = isTransformed ? 'player' : 'playerbig';
+		        var newSrc = 'img/' + baseName + '_right.gif'; // 假设变身后的图片为右侧朝向的图片
+		        player.attr('src', newSrc);
+		        isTransformed = !isTransformed;
+		    });
+		
+		
+		      // 怪兽被打败时显示宝箱
+		        function spawnTreasure(monsterPosition) {
+		            var treasure = $('<img class="treasure" src="img/pet.gif">');
+		            treasure.css({
+		                position: 'absolute',
+		                top: monsterPosition.top + 'px',
+		                left: monsterPosition.left + 'px',
+		                width: '100px',
+		                height: '100px'
+		            });
+		            gameContainer.append(treasure);
+		    
+		            // 点击宝箱后宝箱消失
+		            treasure.on('click', function() {
+		                $(this).remove();
+		            });
+		        }
+		    
+		        // 定义怪兽的刷新和死亡逻辑
+		           function spawnMonster() {
+		               var currentTime = (new Date()).getTime();
+		               if (currentTime - lastMonsterDeathTime > monsterRespawnTime) {
+		                   // 随机选择一个怪兽图片
+		                   var randomMonsterIndex = Math.floor(Math.random() * monsterImages.length);
+		                   var randomX = Math.random() * (gameContainer.width() - 100);
+		                   var randomY = Math.random() * (gameContainer.height() - 100);
+		       
+		                   // 移除之前的怪兽
+		                   if (monsters.length > 0) {
+		                       monsters.forEach(function(monster) {
+		                           monster.hide();
+		                       });
+		                   }
+		       
+		                   // 创建新的怪兽
+		                   var newMonster = $('<img class="monster" src="' + monsterImages[randomMonsterIndex] + '" style="width: 100px; height: 100px; display: none;" />');
+		                   newMonster.css({
+		                       top: randomY,
+		                       left: randomX
+		                   });
+		                   gameContainer.append(newMonster);
+		                   monsters.push(newMonster);
+		       
+		                   // 显示新怪兽
+		                   newMonster.show();
+		       
+		                   lastMonsterDeathTime = currentTime; // 更新怪兽死亡时间
+		               }
+		           }
+		       
+		           // 初始2秒后开始生成怪兽，并之后每隔一定时间生成
+		           setTimeout(spawnMonster, 2000);
+		           setInterval(spawnMonster, monsterRespawnTime);
+		    
+		        // 确保角色在屏幕内
+		        function keepPlayerInScreen() {
+		            var playerPosition = player.position();
+		            if (playerPosition.left < 0) player.css('left', 0);
+		            if (playerPosition.top < 0) player.css('top', 0);
+		            if (playerPosition.left > gameContainer.width() - player.width()) player.css('left', gameContainer.width() - player.width());
+		            if (playerPosition.top > gameContainer.height() - player.height()) player.css('top', gameContainer.height() - player.height());
+		        }
+		        setInterval(keepPlayerInScreen, 100);
+		    
+		       
+		           // 监听怪兽的点击事件
+		           gameContainer.on('click', '.monster', function(e) {
+		               // 确保怪兽在玩家附近100px内被点击
+		               var monsterPosition = $(this).position();
+		               var playerPosition = player.position();
+		               var isClose = Math.abs(monsterPosition.left - playerPosition.left) <= 100 &&
+		                             Math.abs(monsterPosition.top - playerPosition.top) <= 100;
+		       
+		               if (isClose) {
+		                   // 怪兽被打败
+		                   $(this).hide(); // 隐藏怪兽
+		                   lastMonsterDeathTime = (new Date()).getTime(); // 更新怪兽死亡时间
+		       
+		                   // 在怪兽位置生成宝箱
+		                   spawnTreasure(monsterPosition);
+		               }
+		           });
+		       });
+		</script>
+</body>
+</html>
